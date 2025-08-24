@@ -1,0 +1,108 @@
+{
+    "services": [
+        {
+            "id": "1",
+            "name": "hair cut",
+            "description": "A simple hair cut service",
+            "admin_id": "1",
+            "thumbnail": "https://static.manga.com.vn/img-comic/vuu-vat.jpg",
+            "price": 1234,
+            "duration": 1,
+            "status": "approved",
+            "updated_at": "2022-01-01",
+            "created_at": "2022-01-01"
+        },
+        {
+            "id": "2",
+            "name": "hair cut",
+            "description": "A simple hair cut service",
+            "admin_id": "1",
+            "thumbnail": "https://static.manga.com.vn/img-comic/vuu-vat.jpg",
+            "price": 1234,
+            "duration": 1,
+            "status": "approved",
+            "updated_at": "2022-01-01",
+            "created_at": "2022-01-01"
+        },
+        {
+            "id": "3",
+            "name": "hair cut",
+            "description": "A simple hair cut service",
+            "admin_id": "1",
+            "thumbnail": "https://static.manga.com.vn/img-comic/vuu-vat.jpg",
+            "price": 1234,
+            "duration": 1,
+            "status": "approved",
+            "updated_at": "2022-01-01",
+            "created_at": "2022-01-01"
+        }
+    ],
+    "categories": [
+        {
+            "name": "Cắt tóc",
+            "admin_id": "1"
+        },
+        {
+            "name": "Gội đầu",
+            "admin_id": "1"
+        },
+        {
+            "name": "Nhuộm",
+            "admin_id": "1"
+        }
+    ],
+    "bookings": [
+        {
+            "customer_id": "1",
+            "start_time": "1",
+            "end_time": "1",
+            "total_price": 123000,
+            "status": "completed",
+            "code": "ABC123#cascdsa123"
+        },
+        {
+            "customer_id": "1",
+            "start_time": "1",
+            "end_time": "1",
+            "total_price": 123000,
+            "status": "completed",
+            "code": "ABC123#acsdcvasgv1263561"
+        }
+    ],
+    "booking-details": [
+        {
+            "booking_id": "1",
+            "service_id": "1",
+            "start_time": "1",
+            "end_time": "1",
+            "duration": 60,
+            "price": 123000,
+            "code": "ABC123#cascdsa123"
+        }
+    ],
+    "booking-cancel-reason": [
+        {
+            "booking_id": "1",
+            "reason": "Customer requested cancellation"
+        }
+    ],
+    "customers": [
+        {
+            "id": "1",
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+            "phone": "1234567890"
+        }
+    ],
+    "admins": [
+        {
+            "id": "1",
+            "name": "Admin",
+            "email": "admin@example.com",
+            "role": "admin",
+            "password": "hashed_password",
+            "created_at": "2022-01-01",
+            "updated_at": "2022-01-01"
+        }
+    ]
+}
