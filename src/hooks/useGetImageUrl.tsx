@@ -1,7 +1,9 @@
 "use client"
 
+import { getApiBackend } from "@/utils/env.util";
+
 export const useGetImageUrl = (file: string) => {
-    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API ?? "";
+    const backendUrl = getApiBackend();
     const imageUrl = () => {
         if (!file) return "";
         return `${backendUrl}/${file}`;

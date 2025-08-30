@@ -5,8 +5,8 @@ export const runtime = 'edge';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { constructMetadata } from "@/utils/metadata";
-import { RedirectRole } from "@/components/auth/redirect";
 import { AuthContextProvider } from "@/slice/auth.slice";
+import { cookies, headers } from "next/headers";
 export const metadata = constructMetadata(
   {
     title: `Hair bookings`,
@@ -19,10 +19,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = cookies().get("token");
   return (
     <html lang="en">
       <body>
-        <AuthContextProvider>
+        <AuthContextProvider token={token}>
           {children}
         </AuthContextProvider>
         <ToastContainer />

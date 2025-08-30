@@ -1,5 +1,6 @@
 "use server"
 import { slugify } from "./slugify";
+import { getApiBackend } from "./env.util";
 
 /**
  * @description type of parameters to get all bookings
@@ -26,7 +27,7 @@ export const createNewBookings = async (booking: {
     price?: number,
     description?: string
 }) => {
-    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API;
+    const backendUrl = getApiBackend()
     const api = `${backendUrl}/api/bookings`;
     fetch(api, {
         method: "POST",
@@ -63,7 +64,7 @@ export const getAllBookings = async ({
     order = 'asc',
     sortBy = 'created_at'
 }: GetQueryBookings): Promise<DataResponse<{categories: CategoryList}>> => {
-    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API;
+    const backendUrl = getApiBackend();
     const api = `${backendUrl}/api/service-categories?limit=${limit}&offset=${offset}&order=${order}&sortBy=${sortBy}`;
     const res = await fetch(api, {
         cache: "no-cache",

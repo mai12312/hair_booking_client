@@ -18,7 +18,7 @@ import Image from "next/image";
 
 import Link from "next/link"
 import logo from "@/public/images/img_logo.png";
-import { TooltipSidebarAdmin } from "@/components/admin/tool-tip-sidebar-admin";
+import { TooltipSidebarAdmin } from "../tool-tip-sidebar-admin";
 
 export function SideBarAdminDashboard() {
     return (
@@ -58,7 +58,7 @@ export function SideBarAdminDashboard() {
                  {/* Categories */}
                 <TooltipSidebarAdmin
                     tooltipContent="Categories"
-                    href="/dashboard/categories"
+                    href="/admin/dashboard/categories"
                 >
                     <SquareMenu className="h-5 w-5" />
                 </TooltipSidebarAdmin>
@@ -66,7 +66,7 @@ export function SideBarAdminDashboard() {
                 {/* Services */}
                 <TooltipSidebarAdmin
                     tooltipContent="Services"
-                    href="/admin/services"
+                    href="/admin/dashboard/services"
                 >
                     <Images className="h-5 w-5" />
                 </TooltipSidebarAdmin>
@@ -74,7 +74,7 @@ export function SideBarAdminDashboard() {
                 {/* Bookings */}
                 <TooltipSidebarAdmin
                     tooltipContent="Bookings"
-                    href="/admin/bookings"
+                    href="/admin/dashboard/bookings"
                 >
                     <SquareMenu className="h-5 w-5" />
                 </TooltipSidebarAdmin>
@@ -82,7 +82,7 @@ export function SideBarAdminDashboard() {
                 {/* Customer */}
                 <TooltipSidebarAdmin
                     tooltipContent="users"
-                    href="/dashboard/users"
+                    href="/admin/dashboard/users"
                 >
                     <User className="h-5 w-5" />
                 </TooltipSidebarAdmin>

@@ -20,3 +20,8 @@ export const getURl = () => {
 //     path = path.replace(/^\/+/, "");
 //     return path ? `${url}/${path}` : url;
 // };
+
+export const getApiBackend = () => {
+    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API ?? "http://localhost:5000";
+    return backendUrl;
+}

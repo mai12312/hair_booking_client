@@ -31,7 +31,6 @@ export const CustomerContextProvider = memo(({
         email: "",
         phone: "",
     });
-
     return (
         <customerContext.Provider value={{
            customer,

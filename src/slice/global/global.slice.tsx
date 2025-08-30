@@ -1,33 +1,49 @@
 "use client"
-import { useAuthAdmin } from "@/hooks/useAuthAdmin"
+
+import { redirect, usePathname } from "next/navigation";
 import { CreateBookingContextProvider } from "../create-bookings.slice"
 import { CustomerContextProvider } from "../customers.slide"
-import { redirect } from "next/navigation"
-import { useState } from "react"
-
+import { useAuthAdmin } from "@/hooks/useAuthAdmin";
+import { useState } from "react";
+import { CategoriesProvider } from "../categories.slice";
+import { ServicesProvider } from "../services.slide";
 
 export const ProviderContext = ({children}: {children: React.ReactNode}) => {
     const { auth } = useAuthAdmin();
-    // const router = useRouter();
-    const [url] = useState(window.location.href);
-    const [isIncludeUrlAdmin] = useState(url.includes("/admin"));
-    if(auth && auth.isAuth) {
-        if(!isIncludeUrlAdmin) {
+    const pathname = usePathname();
+    const [isIncludeUrlAdmin] = useState(pathname.includes("/admin"));
+    
+    if(auth.accessToken.length > 0) {
+        const isRedirectAdmin = !isIncludeUrlAdmin || isIncludeUrlAdmin && pathname.includes("login");
+        if(isRedirectAdmin) {
             redirect("/admin/dashboard");
         }
-    } else if(auth && !auth.isAuth) {
-        const isAdminUrl = isIncludeUrlAdmin && !url.includes("login");
+    } else if(!auth.isAuth) {
+        const isAdminUrl = isIncludeUrlAdmin && !pathname.includes("login");
         if(isAdminUrl) {
+            redirect("/admin/login");
+        }
+    } else if(auth.isAuth && auth.accessToken.length > 0) {
+        const isRedirectAdmin = !isIncludeUrlAdmin || isIncludeUrlAdmin && pathname.includes("login");
+        if(isRedirectAdmin) {
+            redirect("/admin/dashboard");
+        }
+    } else if(!auth.isAuth && !auth.accessToken) {
+        if(isIncludeUrlAdmin) {
             redirect("/admin/login");
         }
     }
     return (
         <div>
-            <CustomerContextProvider>
-                <CreateBookingContextProvider>
-                    {children}
-                </CreateBookingContextProvider>
-            </CustomerContextProvider>
+            <CategoriesProvider>
+                <ServicesProvider>
+                    <CustomerContextProvider>
+                        <CreateBookingContextProvider>
+                            {children}
+                        </CreateBookingContextProvider>
+                    </CustomerContextProvider>
+                </ServicesProvider>
+            </CategoriesProvider>
         </div>
     )
 }

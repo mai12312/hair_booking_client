@@ -1,51 +1,64 @@
 "use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import React from "react"
+
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import Link from "next/link";
-import { useParams, usePathname } from 'next/navigation'
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
+// Function to capitalize the first letter of a string
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export function BreadcrumbAdmin() {
-    // const params = useParams()
-    // const { slug, volumn } = params
-    const  pathname = usePathname();
-    // console.log("pathname: ", pathname);
-    const breadcrumbItems = pathname.split('/').filter(Boolean);
-    // console.log("BREADCRUMB: ", breadcrumbItems);
+  const pathname = usePathname()
+  const pathSegments = pathname.split("/").filter(Boolean) // e.g., ['admin', 'dashboard']
 
-    const link = (breadcrumbItems: Array<string>, index: number) => {
-        let linkNow = `/${breadcrumbItems[index]}`;
-        for(let i = 0; i < index; i++) {
-            linkNow = `/${breadcrumbItems[i]}` + linkNow;
-        }
-        // console.log("link: ", linkNow);
-        return linkNow;
-    }
+  // This component is for admin pages. We'll hide the root "admin" segment
+  // from the breadcrumb because it's a namespace, not a page with a link.
+  if (pathSegments.length === 0 || pathSegments[0] !== "admin") {
+    return null
+  }
 
-    return (
-        <Breadcrumb className="hidden md:flex">
-            <BreadcrumbList>
-                {
-                    breadcrumbItems.map((item, index) => (
-                       <div key={index}>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink asChild>
-                                    <Link href={link(breadcrumbItems, index)}>{item}</Link>
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            {index != breadcrumbItems.length - 1 &&
-                                <BreadcrumbSeparator />
-                            }
-                       </div>
-                    ))
-                }
+  // Get all segments after "admin" to display in the breadcrumb
+  const displaySegments = pathSegments.slice(1)
 
-            </BreadcrumbList>
-        </Breadcrumb>
-    )
+  // If the path is just "/admin", don't show any breadcrumbs.
+  if (displaySegments.length === 0) {
+    return null
+  }
+
+  return (
+    <Breadcrumb className="hidden md:flex">
+      <BreadcrumbList>
+        {displaySegments.map((segment, index) => {
+          // Reconstruct the full path for the link using the original segments.
+          // e.g., for "users" segment, path is "/admin/users"
+          const href = `/${pathSegments.slice(0, index + 2).join("/")}`
+          const isLast = index === displaySegments.length - 1
+
+          return (
+            <React.Fragment key={href}>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage>{capitalize(segment)}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={href}>{capitalize(segment)}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              {!isLast && <BreadcrumbSeparator />}
+            </React.Fragment>
+          )
+        })}
+      </BreadcrumbList>
+    </Breadcrumb>
+  )
 }

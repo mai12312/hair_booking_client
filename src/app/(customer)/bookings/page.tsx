@@ -2,8 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreateBooking } from "@/hooks/useCreateBooking";
+import { useFunctions } from "@/hooks/useFunctions";
 import { useGetCustomer } from "@/hooks/useGetCustomer";
 import { getAllCategories } from "@/utils/categories.util";
+import { getApiBackend } from "@/utils/env.util";
 import { getAllServices } from "@/utils/services.util";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,7 +17,7 @@ const fetchServices = async (): Promise<ServiceList> => {
  const { datas: {services} } = await getAllServices({});
  return services;
 };
-const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API;
+const backendUrl = getApiBackend();
 
 const fetchServiceCategories = async (): Promise<CategoryList> => {
  const { datas: {categories} } = await getAllCategories({});
@@ -57,7 +59,8 @@ const BookingPage: React.FC = () => {
   // Step 5: Submit
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);    
+  const { formatPrice } = useFunctions();
 
   useEffect(() => {
     fetchServices().then(setServices);
@@ -178,7 +181,7 @@ const BookingPage: React.FC = () => {
             <label className="block mb-2 font-medium">Số điện thoại</label>
             <Input
               className="w-full border rounded px-2 py-2 mb-4"
-              type="number"
+              type="tel"
               value={customer.phone ?? 0}
               onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
               placeholder="Nhập số điện thoại"
@@ -237,7 +240,8 @@ const BookingPage: React.FC = () => {
                             <div className="flex flex-col items-start">
                               <span>{service.name}</span>
                               <span className={`text-xs ${selectedServices[category.id] === service.id ? "" : "text-gray-500"}`}>
-                                Giá: {service.price?.toLocaleString()}₫
+                                {/* Giá: {service.price?.toLocaleString()}₫ */}
+                                Giá: {formatPrice(service.price ?? 0)}
                               </span>
                             </div>
                           </button>
@@ -251,7 +255,7 @@ const BookingPage: React.FC = () => {
             {/* Overview */}
             <div className="w-full bg-white py-4 px-6 shadow-sm my-2 border">
               <div className="">Đã chọn {selectedServiceIds.length} dịch vụ</div>
-              <div className="">Tổng tiền: {calculateTotalPrice().toLocaleString()}₫</div>
+              <div className="">Tổng tiền: {formatPrice(calculateTotalPrice())}</div>
             </div>
             <div className="flex justify-between">
               <button

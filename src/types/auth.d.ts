@@ -4,6 +4,6 @@
 export declare module AuthContext {
     type TAuthContext = {
         auth: AuthAdmin,
-        setAuth: React.Dispatch<SetStateAction<AuthAdmin>>
+        changeAuth: React.Dispatch<SetStateAction<AuthAdmin>>
     }
 }

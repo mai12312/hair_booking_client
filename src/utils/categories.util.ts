@@ -1,4 +1,5 @@
 "use server"
+import { getApiBackend } from "./env.util";
 import { slugify } from "./slugify";
 
 /**
@@ -26,7 +27,7 @@ export const createNewCategories = async (service: {
     price?: number,
     description?: string
 }) => {
-    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API;
+    const backendUrl = getApiBackend();
     const api = `${backendUrl}/api/services`;
     fetch(api, {
         method: "POST",
@@ -63,7 +64,7 @@ export const getAllCategories = async ({
     order = 'asc',
     sortBy = 'created_at'
 }: GetQueryServices): Promise<DataResponse<{categories: CategoryList}>> => {
-    const backendUrl = process.env.NEXT_PUBLIC_HAIR_BOOKING_API;
+    const backendUrl = getApiBackend();
     const api = `${backendUrl}/api/service-categories?limit=${limit}&offset=${offset}&order=${order}&sortBy=${sortBy}`;
     const res = await fetch(api, {
         cache: "no-cache",

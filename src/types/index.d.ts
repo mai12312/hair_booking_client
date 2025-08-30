@@ -32,10 +32,10 @@ export declare global {
      */
     type Category = {
         id: number;
-        adminId: number;
+        adminId?: number;
         name: string;
         displayOrder?: number;
-        status?: boolean;
+        status?: number;
         createdAt?: string;
         updatedAt?: string;
     }
