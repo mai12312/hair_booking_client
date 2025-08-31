@@ -63,7 +63,11 @@ export function useFunctions() {
         };
       }
     }
-
+    /**
+     * Formats a price into a specific currency format.
+     * @param price - The price to format.
+     * @returns The formatted price string.
+     */
     function formatPrice(price: number): string {
       return new Intl.NumberFormat('vi-VN', {
         style: 'currency',

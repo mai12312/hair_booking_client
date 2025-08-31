@@ -41,7 +41,8 @@ export function DialogAddCategoriesAdmin() {
             body: JSON.stringify({ name, displayOrder }),
         })
         .then(res => res.json())
-        .then((data) => {
+        .then((data: DataResponse<{id: number}>) => {
+            console.log("data create category: ", data);
             if(data["status"] == 201) {
                 const newCategory:Category = {
                     name,

@@ -30,47 +30,106 @@ import { useGetServices } from "@/hooks/useGetServices"
 import Image from "next/image"
 import { formatDateByMomentjs } from "@/utils/format-date"
 import { useFunctions } from "@/hooks/useFunctions"
+import { getApiBackend } from "@/utils/env.util"
+import { useAuthAdmin } from "@/hooks/useAuthAdmin"
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 export function ContentMainServicesAdmin() {
-    const {services, setServices, pending, setShowEditDialog} = useGetServices();
-    const [service, setService] = useState<{id: string, name: string}>({
-        id: "",
-        name: ""
-    });
+    const {services, setServices, pending} = useGetServices();
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [deleteService, setDeleteService] = useState<Service | null>(null);
     const { formatPrice } = useFunctions();
+    const {auth} = useAuthAdmin();
 
     if(services.length == 0 && !pending) return <EmptyContentAdmin message="Empty services!"/>;
     else if(services.length == 0 && pending) return <SpinnerLoadingAdmin/>;
-    
-    const handleClickEdit = (id: string, name: string) => {
-        setService({id, name});
-        setShowEditDialog(true);
+
+    const handleClickEdit = (service: Service) => {
+        setSelectedService(service);
+        setEditDialogOpen(true);
     }
 
-    const handleClickDelete = (id: number) => {
-        fetch(`/api/services/${id}`, {
+    const handleClickDelete = (service: Service) => {
+        setDeleteService(service);
+        setShowDeleteDialog(true);
+    }
+
+    // Separated function to check if a service has bookings
+    const checkServicesHaveBookings = async (serviceId: number) => {
+        try {
+            const res = await fetch(`${getApiBackend()}/api/services/${serviceId}/booking-details`, {
+                headers: {
+                    "Authorization": `Bearer ${auth?.accessToken ?? ""}`
+                }
+            });
+            const bookingsData = await res.json();
+            const bookings = bookingsData?.datas?.bookings || bookingsData;
+            if (bookings && Array.isArray(bookings) && bookings.length > 0) {
+                return true;
+            }
+        } catch (err) {
+            toast.error("Xóa dịch vụ thất bại! Vui lòng thử lại!");
+            return true;
+        }
+        return false;
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!deleteService) return;
+        // Check if service has bookings before deleting
+        const hasBooking = await checkServicesHaveBookings(deleteService.id);
+        if (hasBooking) {
+            toast.error("Không thể xóa dịch vụ vì có lịch đặt!", {
+                position: "bottom-right"
+            });
+            setShowDeleteDialog(false);
+            setDeleteService(null);
+            return;
+        }
+
+        fetch(`${getApiBackend()}/api/services/${deleteService.id}`, {
             method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${auth?.accessToken ?? ""}`
+            }
         })
         .then((res) => res.json())
         .then((data) => {
             if(data["status"] == 201) {
                 const newServices: ServiceList = [];
                 services.map((service: Service) => {
-                    if(service.id !== id) {
+                    if(service.id !== deleteService.id) {
                         newServices.push(service);
                     }
                 })
                 setServices([...newServices]);
 
-                toast.success("Delete the service successfully!", {
+                toast.success("Xóa dịch vụ thành công!", {
                     position: "bottom-right"
                 });
             } else {
-                toast.error("Delete error! Please try again!", {
+                toast.error("Xóa dịch vụ thất bại! Vui lòng thử lại!", {
                     position: "bottom-right"
                 });
             }
+            setShowDeleteDialog(false);
+            setDeleteService(null);
         })
+        .catch((err) => {
+            toast.error("Xóa dịch vụ thất bại! Vui lòng thử lại!", {
+                position: "bottom-right"
+            });
+            setShowDeleteDialog(false);
+            setDeleteService(null);
+        });
     }
 
     return (
@@ -92,10 +151,14 @@ export function ContentMainServicesAdmin() {
                         </TableHead>
                         <TableHead>
                             <span className="sr-only">Actions</span>
-                            <DialogEditServicesAdmin
-                                id={service.id}
-                                serviceName={service.name}
-                            />
+                            {/* Remove old DialogEditServicesAdmin here */}
+                            {selectedService && (
+                                <DialogEditServicesAdmin
+                                    service={selectedService}
+                                    isOpen={editDialogOpen}
+                                    setOpen={setEditDialogOpen}
+                                />
+                            )}
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -147,12 +210,12 @@ export function ContentMainServicesAdmin() {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                         <DropdownMenuItem 
-                                            onClick = {(e) => handleClickEdit(String(service.id), service.name)}
+                                            onClick={() => handleClickEdit(service)}
                                         >
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem 
-                                            onClick={e => handleClickDelete(service.id)}
+                                            onClick={() => handleClickDelete(service)}
                                         >Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -161,7 +224,32 @@ export function ContentMainServicesAdmin() {
                     ))}
                 </TableBody>
             </Table>
-            
+            {/* Confirm Delete Dialog */}
+            <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Bạn có muốn xóa dịch vụ không?</DialogTitle>
+                    </DialogHeader>
+                    <div>
+                        <p>Tên dịch vụ: {deleteService?.name}</p>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                            Hủy
+                        </Button>
+                        <Button variant="destructive" onClick={handleConfirmDelete}>
+                            Xóa
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            {selectedService && (
+                <DialogEditServicesAdmin
+                    service={selectedService}
+                    isOpen={editDialogOpen}
+                    setOpen={setEditDialogOpen}
+                />
+            )}
         </>
     )
 }

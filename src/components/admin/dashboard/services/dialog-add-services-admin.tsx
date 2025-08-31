@@ -38,6 +38,7 @@ export function DialogAddServicesAdmin() {
     const {auth} = useAuthAdmin();
     const [image, setImage] = useState<string>("");
     const [mediaDialogOpen, setMediaDialogOpen] = useState(false);
+    console.log("categoryId:: ", categoryId);
 
     const handleCreateServices = () => {
         setLoading(true);
@@ -57,7 +58,7 @@ export function DialogAddServicesAdmin() {
             }),
         })
         .then(res => res.json())
-        .then((data: DataResponse<Service>) => {
+        .then((data: DataResponse<{id: number}>) => {
             if(data["status"] == 201) {
                 const newService:Service = {
                     name,
@@ -158,7 +159,7 @@ export function DialogAddServicesAdmin() {
                                 id="category"
                                 value={categoryId}
                                 className="col-span-3 border rounded px-2 py-1"
-                                onChange={e => setCategoryId(Number(e.target.value))}
+                                onChange={e => setCategoryId(Number(e.target.value) ?? 0)}
                             >
                                 <option value={0} disabled>
                                     -- Chọn danh mục --

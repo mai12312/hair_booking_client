@@ -214,7 +214,7 @@ const BookingPage: React.FC = () => {
                           <div className="w-full relative min-h-[500px] overflow-hidden">
                             <Image 
                               // src={service.image ?? ""} 
-                              src={"https://tse1.explicit.bing.net/th/id/OIP.SUIzGQ7dtPFCXUF_-7WVVAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"} 
+                              src={service.image ?? "https://tse1.explicit.bing.net/th/id/OIP.SUIzGQ7dtPFCXUF_-7WVVAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"} 
                               alt={service.name} 
                               loading="lazy"
                               className="object-cover hover:scale-110 transition-all duration-300 ease-in-out"

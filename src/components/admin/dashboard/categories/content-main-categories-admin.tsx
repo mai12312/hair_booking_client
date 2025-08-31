@@ -43,6 +43,7 @@ export function ContentMainCategoriesAdmin() {
     const {auth} = useAuthAdmin();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
+    console.log("categories:: ", categories);
 
     if(!categories || categories.length == 0 && !pending) return <EmptyContentAdmin message="Empty categories!"/>;
     else if(categories.length == 0 && pending) return <SpinnerLoadingAdmin/>;
@@ -56,14 +57,19 @@ export function ContentMainCategoriesAdmin() {
         setDeleteCategory(category);
         setShowDeleteDialog(true);
     }
-    // Get service by categoryId
+    // Get services by categoryId
     const getServiceByCategoryId = async (categoryId: number) => {
         const res = await fetch(`${getApiBackend()}/api/service-categories/${categoryId}/services`, {
             headers: {
                 "Authorization": `Bearer ${auth?.accessToken ?? ""}`
             }
         });
-        return res.json();
+        const data: DataResponse<{services: Service}> = await res.json();
+        if(data && data.status == 200) {
+            const services = data.datas.services ?? [];
+            return services;
+        }
+        return [];
     }
     // check if services have bookings
     const checkServicesHaveBookings = async (services: Service[]) => {
@@ -73,9 +79,14 @@ export function ContentMainCategoriesAdmin() {
                     "Authorization": `Bearer ${auth?.accessToken ?? ""}`
                 }
             });
-            const bookings = await resBooking.json();
-            if (bookings && Array.isArray(bookings) && bookings.length > 0) {
-                return true;
+            const data: DataResponse<{bookings: Booking[]}> = await resBooking.json();
+            if(data && data.status == 200) {
+                const bookings = data.datas ?? [];
+                console.log("bookings:: ", bookings);
+                if (bookings && Array.isArray(bookings) && bookings.length > 0) {
+                    return true;
+                }
+                return false;
             }
         }
         return false;
@@ -85,6 +96,7 @@ export function ContentMainCategoriesAdmin() {
         if (!deleteCategory) return;
         // Check if category has services
         const services = await getServiceByCategoryId(deleteCategory.id);
+        console.log("services:: ", services);
         if (services && Array.isArray(services) && services.length > 0) {
             const hasBooking = await checkServicesHaveBookings(services);
             if (hasBooking) {
