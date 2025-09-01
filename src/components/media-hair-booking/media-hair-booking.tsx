@@ -26,7 +26,6 @@ export function MediaHairBooking({ open, onOpenChange, onSelect }: MediaHairBook
         fetch(`${getApiBackend()}/api/media`)
             .then(res => res.json())
             .then(data => {
-                console.log("data images: ", data)
                 setImages(data?.images || []);
                 setLoading(false);
             })
@@ -54,7 +53,6 @@ export function MediaHairBooking({ open, onOpenChange, onSelect }: MediaHairBook
                 body: formData,
             });
             const data: DataResponse<{ imageUrl: string }> = await res.json();
-            console.log("data upload image: ", data);
             const imageUrl = data?.datas?.imageUrl ?? "";
             if(data.status === 201 && imageUrl) {
                 toast.success("Upload hình ảnh thành công!")

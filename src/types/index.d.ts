@@ -59,6 +59,17 @@ export declare global {
     }
     type ServiceList = Array<Service>;
 
+    type ServicesByCategories = {
+        services: Service[];
+        id: number;
+        adminId?: number;
+        name: string;
+        displayOrder?: number;
+        status?: number;
+        createdAt?: string;
+        updatedAt?: string;
+    };
+
     /**
      * @desc type of "customers" table in database
      */
@@ -76,21 +87,22 @@ export declare global {
      * @desc type of "bookings" table in database
      */
     type Booking = {
-        id: number;
+        id?: number;
         status?: string;
         startTime: string;
         endTime?: string;
-        date: string;
+        date?: string;
         totalPrice?: number;
         totalDuration?: number;
         customerEmail: string;
         customerPhone: string;
         customerName: string;
-        serviceIds: Array<number>;
+        serviceIds?: Array<number>;
         createdByAdminId?: number;
         code?: string;
         createdAt?: string;
         updatedAt?: string;
+        time?: string;
     }
     type BookingList = Array<Booking>;
 

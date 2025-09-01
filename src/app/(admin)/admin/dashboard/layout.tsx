@@ -3,6 +3,7 @@ import { HeaderAdmin } from "@/components/admin/header-admin";
 
 import { constructMetadata } from "@/utils/metadata";
 export const metadata = constructMetadata();
+
 export default function Layout({
     children
 }: {

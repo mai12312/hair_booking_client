@@ -1,8 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateBooking } from "@/hooks/useCreateBooking";
 import { useFunctions } from "@/hooks/useFunctions";
+import { useFunctionBookings } from "@/hooks/useFuntionBookings";
+import { useFunctionServices } from "@/hooks/useFuntionServices";
+import { useGetBookings } from "@/hooks/useGetBookings";
 import { useGetCustomer } from "@/hooks/useGetCustomer";
 import { getAllCategories } from "@/utils/categories.util";
 import { getApiBackend } from "@/utils/env.util";
@@ -41,16 +43,11 @@ const BookingPage: React.FC = () => {
   const [services, setServices] = useState<ServiceList>([]);
   const [categories, setCategories] = useState<CategoryList>([]);
   const serviceFilter = services.filter(s => s.status == "approved");
-  const servicesByCategories = categories.map(category => {
-    const servicesInCategory = serviceFilter.filter(service => service.categoryId === category.id);
-    return { ...category, services: servicesInCategory };
-  });
-
+  const [servicesByCategories, setServicesByCategories] = useState<Array<ServicesByCategories>>([]);
+  
   // Store selected services as { [categoryId]: serviceId }
-  const [selectedServices, setSelectedServices] = useState<any>([]);
-
-  // Get selected service IDs as array
-  const selectedServiceIds = Object.values(selectedServices).filter(Boolean);
+  const [selectedServices, setSelectedServices] = useState<Array<number>>([]);
+  const selectedServiceIds: Array<number> = Object.values(selectedServices).filter(Boolean);
 
   // Step 3: Date/Time
   const [date, setDate] = useState("");
@@ -60,28 +57,75 @@ const BookingPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);    
-  const { formatPrice } = useFunctions();
+  const { formatPrice, getAvailableTimes, formatPhoneNumber, checkPhoneNumber } = useFunctions();
+  const { bookings } = useGetBookings();
+  const { checkConflictBooking } = useFunctionBookings(services);
+  const { calculateTotalPrice } = useFunctionServices();
+  const [timeoutPhone, setTimeoutPhone] = useState<NodeJS.Timeout | null>(null);
+  const [errorPhoneNumber, setErrorPhoneNumber] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     fetchServices().then(setServices);
     fetchServiceCategories().then(setCategories);
   }, []);
+  
+  useEffect(() => {
+    const servicesByCategories: Array<ServicesByCategories> = categories.map((category) => {
+      const servicesInCategory = serviceFilter.filter(
+        (service) => service.categoryId === category.id
+      );
+      return { ...category, services: servicesInCategory };
+    })
+    const filteredServicesByCategories = servicesByCategories
+    .filter((category) => category.services.length > 0);
+    setServicesByCategories(filteredServicesByCategories);
+  }, [categories, services]);
 
   const handleNext = () => setStep((s) => s + 1);
   const handleBack = () => setStep((s) => s - 1);
+
+  const handleAddPhone = () => {
+    if(!customer.phone) {
+      toast.error("Vui lòng nhập số điện thoại");
+      return;
+    }
+    const {error} = checkPhoneNumber(customer.phone);
+    if (error) {
+      setErrorPhoneNumber(error);
+      return;
+    }
+    handleNext();
+  }
+
+  const handleChangePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    if(formatted.error) {
+      setErrorPhoneNumber(formatted.error);
+      if (timeoutPhone) {
+        clearTimeout(timeoutPhone);
+      }
+      setTimeoutPhone(setTimeout(() => {
+        setErrorPhoneNumber("");
+      }, 3000));
+    } else {
+      setPhone(formatted.phoneNumber ?? "");
+      setCustomer({ ...customer, phone: e.target.value });
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
     setSuccess(null);
-
+    const conflict = checkConflictBooking(`${date}T${time}:00`, bookings);
+    if (conflict) {
+      toast.error("Đã có lịch đặt vào thời gian này. Vui lòng chọn thời gian khác!");
+      setSubmitting(false);
+      return;
+    }
     // Dummy API call, replace with real booking logic
-    // setTimeout(() => {
-    //   setSubmitting(false);
-    //   setSuccess("Đặt lịch thành công!");
-    // }, 1000);
-    // Use NEXT_PUBLIC_ prefix for frontend env variables
     const api = `${backendUrl}/api/bookings`;
     fetch(api, {
       method: "POST",
@@ -113,45 +157,13 @@ const BookingPage: React.FC = () => {
       })
       .finally(() => {
         setSubmitting(false);
+        setTimeout(function() {
+          setError(null);
+          setSuccess(null);
+        }, 2000)
       });
   };
 
-  // Helper to get available times (every 20 min from 9:00 to 20:00)
-  const getAvailableTimes = () => {
-    const times: string[] = [];
-    for (let h = 9; h <= 20; h++) {
-      for (let m of [0, 20, 40]) {
-        const hour = h.toString().padStart(2, "0");
-        const min = m.toString().padStart(2, "0");
-        times.push(`${hour}:${min}`);
-      }
-    }
-    // Filter out times in the past if date is today
-    if (date) {
-      const now = new Date();
-      const selectedDate = new Date(date + "T00:00");
-      if (
-        now.getFullYear() === selectedDate.getFullYear() &&
-        now.getMonth() === selectedDate.getMonth() &&
-        now.getDate() === selectedDate.getDate()
-      ) {
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-        return times.filter((t) => {
-          const [h, m] = t.split(":").map(Number);
-          return h * 60 + m > nowMinutes;
-        });
-      }
-    }
-    return times;
-  };
-
-  // Helper: Calculate total price of selected services
-  const calculateTotalPrice = () => {
-    return selectedServiceIds.reduce((sum:number, id) => {
-      const service = services.find((s) => s.id === id);
-      return sum + (service?.price || 0);
-    }, 0);
-  };
 
   return (
     <div className="max-w-[1200px] mx-auto mt-8 p-4 border rounded shadow bg-white">
@@ -182,16 +194,18 @@ const BookingPage: React.FC = () => {
             <Input
               className="w-full border rounded px-2 py-2 mb-4"
               type="tel"
-              value={customer.phone ?? 0}
-              onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+              value={phone ?? ""}
+              onChange={handleChangePhoneNumber}
               placeholder="Nhập số điện thoại"
               required
             />
+            {errorPhoneNumber && <div className="text-red-500">{errorPhoneNumber}</div>}
+
             <button
               type="button"
               className="w-full bg-blue-600 text-white py-2 rounded"
               disabled={!customer.phone}
-              onClick={handleNext}
+              onClick={handleAddPhone}
             >
               Tiếp tục
             </button>
@@ -255,7 +269,7 @@ const BookingPage: React.FC = () => {
             {/* Overview */}
             <div className="w-full bg-white py-4 px-6 shadow-sm my-2 border">
               <div className="">Đã chọn {selectedServiceIds.length} dịch vụ</div>
-              <div className="">Tổng tiền: {formatPrice(calculateTotalPrice())}</div>
+              <div className="">Tổng tiền: {formatPrice(calculateTotalPrice(serviceFilter, selectedServiceIds))}</div>
             </div>
             <div className="flex justify-between">
               <button
@@ -295,12 +309,12 @@ const BookingPage: React.FC = () => {
             />
             <label className="block mb-2 font-medium">Chọn giờ</label>
             <div className="grid grid-cols-4 gap-2 mb-4">
-              {getAvailableTimes().length === 0 && (
+              {getAvailableTimes(date).length === 0 && (
                 <span className="col-span-4 text-gray-400 text-sm">
                   Không còn khung giờ nào phù hợp hôm nay
                 </span>
               )}
-              {getAvailableTimes().map((t) => (
+              {getAvailableTimes(date).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -390,10 +404,6 @@ const BookingPage: React.FC = () => {
                   .filter(Boolean)
                   .join(", ")}
               </li>
-              {/* If you want to show the IDs: */}
-              {/* <li>
-                <b>serviceIds:</b> [{selectedServiceIds.join(", ")}]
-              </li> */}
               <li>
                 <b>Ngày:</b> {date}
               </li>

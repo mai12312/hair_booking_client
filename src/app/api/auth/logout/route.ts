@@ -12,7 +12,6 @@ export async function POST(request: Request) {
         },
     })
     const data = await res.json();
-    console.log("Response from logout: ", data);
     // Extract token after "Bearer "
     if(data.status == 204) {
         cookies().delete('token');

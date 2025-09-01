@@ -38,7 +38,6 @@ export function DialogAddServicesAdmin() {
     const {auth} = useAuthAdmin();
     const [image, setImage] = useState<string>("");
     const [mediaDialogOpen, setMediaDialogOpen] = useState(false);
-    console.log("categoryId:: ", categoryId);
 
     const handleCreateServices = () => {
         setLoading(true);

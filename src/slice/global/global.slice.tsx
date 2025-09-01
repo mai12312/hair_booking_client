@@ -7,6 +7,7 @@ import { useAuthAdmin } from "@/hooks/useAuthAdmin";
 import { useState } from "react";
 import { CategoriesProvider } from "../categories.slice";
 import { ServicesProvider } from "../services.slide";
+import { BookingsProvider } from "../bookings.slice";
 
 export const ProviderContext = ({children}: {children: React.ReactNode}) => {
     const { auth } = useAuthAdmin();
@@ -37,11 +38,13 @@ export const ProviderContext = ({children}: {children: React.ReactNode}) => {
         <div>
             <CategoriesProvider>
                 <ServicesProvider>
-                    <CustomerContextProvider>
-                        <CreateBookingContextProvider>
-                            {children}
-                        </CreateBookingContextProvider>
-                    </CustomerContextProvider>
+                    <BookingsProvider>
+                        <CustomerContextProvider>
+                            <CreateBookingContextProvider>
+                                {children}
+                            </CreateBookingContextProvider>
+                        </CustomerContextProvider>
+                    </BookingsProvider>
                 </ServicesProvider>
             </CategoriesProvider>
         </div>

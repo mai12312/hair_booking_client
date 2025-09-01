@@ -14,7 +14,6 @@ export function LogoutButton() {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log("Logout response data: ", data);
                 if(data.status == 204) {
                     toast.success("Bạn đã đăng xuất thành công!");
                     changeAuth({

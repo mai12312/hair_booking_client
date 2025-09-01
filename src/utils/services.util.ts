@@ -14,46 +14,6 @@ type GetQueryServices = {
     order?: 'asc' | 'desc';
     sortBy?: string;
 }
-/**
- * Create a new service
- */
-export const createNewService = async (service: {
-    name: string,
-    admin_id: number,
-    category_id: number,
-    status?: string,
-    image?: string,
-    duration?: number,
-    price?: number,
-    description?: string
-}) => {
-    const backendUrl = getApiBackend();
-    const api = `${backendUrl}/api/services`;
-    fetch(api, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            ...service,
-            slug: slugify(service.name, { replacement: "-" })
-        })
-    })
-}
-
-/**
- * Update a service
- */
-export const updateService = async (service: Partial<Service> & { id: string }) => {
-   
-}
-
-/**
- * Delete a service
- */
-export const deleteService = async (id: string) => {
-   
-}
 
 /**
  * Get all services
@@ -74,11 +34,4 @@ export const getAllServices = async ({
         },
     })
     return await res.json();
-}
-
-/**
- * Find a service by ID
- */
-export const findServiceById = async (id: string) => {
-   
 }

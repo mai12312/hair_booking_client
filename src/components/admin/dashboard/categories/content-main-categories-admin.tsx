@@ -43,7 +43,6 @@ export function ContentMainCategoriesAdmin() {
     const {auth} = useAuthAdmin();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
-    console.log("categories:: ", categories);
 
     if(!categories || categories.length == 0 && !pending) return <EmptyContentAdmin message="Empty categories!"/>;
     else if(categories.length == 0 && pending) return <SpinnerLoadingAdmin/>;
@@ -82,7 +81,6 @@ export function ContentMainCategoriesAdmin() {
             const data: DataResponse<{bookings: Booking[]}> = await resBooking.json();
             if(data && data.status == 200) {
                 const bookings = data.datas ?? [];
-                console.log("bookings:: ", bookings);
                 if (bookings && Array.isArray(bookings) && bookings.length > 0) {
                     return true;
                 }
@@ -96,7 +94,6 @@ export function ContentMainCategoriesAdmin() {
         if (!deleteCategory) return;
         // Check if category has services
         const services = await getServiceByCategoryId(deleteCategory.id);
-        console.log("services:: ", services);
         if (services && Array.isArray(services) && services.length > 0) {
             const hasBooking = await checkServicesHaveBookings(services);
             if (hasBooking) {
@@ -116,7 +113,6 @@ export function ContentMainCategoriesAdmin() {
         })
         .then((res) => res.json())
         .then((data) => {
-            console.log("data is deleted", data);
             if(data["status"] == 201) {
                 const newCategories: CategoryList = [];
                 categories.map((category: Category) => {

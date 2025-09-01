@@ -55,6 +55,7 @@ export function SideBarAdminDashboard() {
                 >
                     <Home className="h-5 w-5" />
                 </TooltipSidebarAdmin>
+
                  {/* Categories */}
                 <TooltipSidebarAdmin
                     tooltipContent="Categories"
@@ -75,6 +76,13 @@ export function SideBarAdminDashboard() {
                 <TooltipSidebarAdmin
                     tooltipContent="Bookings"
                     href="/admin/dashboard/bookings"
+                >
+                    <SquareMenu className="h-5 w-5" />
+                </TooltipSidebarAdmin>
+                {/* Calendar */}
+                <TooltipSidebarAdmin
+                    tooltipContent="Calendar"
+                    href="/admin/dashboard/calendar"
                 >
                     <SquareMenu className="h-5 w-5" />
                 </TooltipSidebarAdmin>

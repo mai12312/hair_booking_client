@@ -65,7 +65,6 @@ export function DialogEditCategoriesAdmin({
         .then(res => res.json())
         .then((data) => {
             // success
-            console.log("data update category: ", data);
             if(data["status"] == 200) {
                 const updatedCategory: Category = {
                     id: category.id ?? 0,
@@ -102,7 +101,6 @@ export function DialogEditCategoriesAdmin({
         });
     }
 
-    console.log("category status: ", category);
     return (
         <div>
             <Dialog open={isShowEditDialog} onOpenChange={() => setShowEditDialog(false)}>

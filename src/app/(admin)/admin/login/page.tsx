@@ -35,7 +35,8 @@ export default function LoginPage() {
                         changeAuth({
                             email,
                             accessToken: data.datas?.accessToken ?? "",
-                            isAuth: true
+                            isAuth: true,
+                            admin: data.datas?.admin ?? null
                         });
                         toast.success("Đăng nhập thành công");
                         setTimeout(() => {

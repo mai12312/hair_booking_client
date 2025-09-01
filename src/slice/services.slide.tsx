@@ -36,7 +36,6 @@ export const ServicesProvider = memo(function ServicesProvider({children}: {chil
         fetch(api)
            .then(res => res.json())
            .then((data: DataResponse<{services: ServiceList}>) => {
-                console.log("data services: ", data);
                 if(data && data.status === 200) {
                     setServices(data.datas?.services ?? []);
                 }

@@ -12,6 +12,12 @@ export function useFunctions() {
      * @returns The formatted phone number.
      */
     function formatPhoneNumber(phoneNumber: string):ErrorPhone  {
+      if(isNaN(Number(phoneNumber))) {
+        return {
+          error: "Số điện thoại không hợp lệ",
+          phoneNumber
+        };
+      }
       // Remove any non-digit characters
       const digits = phoneNumber.replace(/\D/g, '');
 
@@ -74,10 +80,42 @@ export function useFunctions() {
         currency: 'VND',
       }).format(price);
     }
+    /**
+     * Get available times for a specific date.
+     * @param date - The date to check for available times.
+     * @returns An array of available time slots.
+     */
+    function getAvailableTimes(date: string) {
+      const times: string[] = [];
+      for (let h = 9; h <= 20; h++) {
+        for (let m of [0, 20, 40]) {
+          const hour = h.toString().padStart(2, "0");
+          const min = m.toString().padStart(2, "0");
+          times.push(`${hour}:${min}`);
+        }
+      }
+      if (date) {
+        const now = new Date();
+        const selectedDate = new Date(date + "T00:00");
+        if (
+          now.getFullYear() === selectedDate.getFullYear() &&
+          now.getMonth() === selectedDate.getMonth() &&
+          now.getDate() === selectedDate.getDate()
+        ) {
+          const nowMinutes = now.getHours() * 60 + now.getMinutes();
+          return times.filter((t) => {
+            const [h, m] = t.split(":").map(Number);
+            return h * 60 + m > nowMinutes;
+          });
+        }
+      }
+      return times;
+    };
 
     return {
       formatPhoneNumber,
       checkPhoneNumber,
-      formatPrice
+      formatPrice,
+      getAvailableTimes
     }
 }

@@ -1,11 +1,33 @@
-"use client"
-import { CalendarBookings } from "@/components/user/bookings/calendar-bookings";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
-export default function BookingsPage() {
-  return (
-    <div>
-      <h1>Bookings</h1>
-      <CalendarBookings />
-    </div>
-  );
+import {
+  Tabs,
+  TabsContent,
+} from "@/components/ui/tabs";
+
+export default function Page() {
+    return (
+        <Tabs defaultValue="all">
+            <div className="flex flex-row-reverse items-center">
+                <DialogAddCategoriesAdmin/>
+            </div>
+            <TabsContent value="all">
+                <Card x-chunk="dashboard-06-chunk-0">
+                    <CardHeader>
+                        <CardTitle>Categories</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ContentMainCategoriesAdmin/>
+                    </CardContent>
+                    <CardFooter/>
+                </Card>
+            </TabsContent>
+        </Tabs>
+    )
 }
