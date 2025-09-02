@@ -339,3 +339,7 @@
         transform: rotate(-1turn);
     }
 }
+
+.fc .fc-popover {
+    z-index: 10;
+}

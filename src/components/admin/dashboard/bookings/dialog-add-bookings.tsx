@@ -30,7 +30,7 @@ export function DialogAddBookings({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   addBookingToClient: (titleEvent: string, booking: Partial<Booking>) => void;
-  selectedDate: DateSelectArg | null;
+  selectedDate?: DateSelectArg | null;
 }) {
   const [step, setStep] = useState(0);
   const { customer, setCustomer } = useGetCustomer();
@@ -46,6 +46,7 @@ export function DialogAddBookings({
     time: "",
     date: ""
   });
+
   // Step 2: Service
   const serviceFilter = services.filter((s) => s.status == "approved");
 
@@ -75,6 +76,8 @@ export function DialogAddBookings({
   const [error, setError] = useState<string | null>(null);
   const [errorPhoneNumber, setErrorPhoneNumber] = useState<string | null>(null);
   const { auth } = useAuthAdmin();
+  console.log("Logging in:", auth);
+
   const { bookings , setBookings } = useGetBookings();
   const { calculateTotalPrice, calculateTotalDuration } = useFunctionServices();
 

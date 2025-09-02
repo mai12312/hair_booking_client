@@ -2,11 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  formatDate,
   DateSelectArg,
   EventClickArg,
-  EventApi,
-  EventSourceInput,
   EventInput,
 } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
@@ -17,13 +14,23 @@ import { DialogAddBookings } from "./dialog-add-bookings";
 import { useGetBookings } from "@/hooks/useGetBookings";
 import { useFunctionBookings } from "@/hooks/useFuntionBookings";
 import { useAuthAdmin } from "@/hooks/useAuthAdmin";
+import { DialogEditBookingAdmin } from "./dialog-edit-booking";
 
 export const CalendarBookings: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
-  const { bookings } = useGetBookings();
+  const { bookings, setShowEditDialog, setEndTime, setStartTime } = useGetBookings();
   const { mapBookingToEvent, fetchBookings } = useFunctionBookings(bookings);
   const [currentEvents, setCurrentEvents] = useState<Array<EventInput>>([]);
+  const [selectedBooking, setSelectedBooking] = useState<Booking>({
+    id: 0,
+    customerName: "",
+    startTime: "",
+    endTime: "",
+    status: "",
+    customerEmail: "",
+    customerPhone: "",
+  });
   const { auth } = useAuthAdmin();
   const handleDateClick = (selected: DateSelectArg) => {
     setSelectedDate(selected);
@@ -34,13 +41,10 @@ export const CalendarBookings: React.FC = () => {
   }, [bookings])
 
   const handleEventClick = (selected: EventClickArg) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event "${selected.event.title}"?`
-      )
-    ) {
-      selected.event.remove();
-    }
+    const booking = bookings.find((b) => b.code === selected.event.title);
+    if(!booking) return;
+    setSelectedBooking(booking);
+    setShowEditDialog(true);
   };
   const addBookingToClient = (titleEvent: string, booking: Partial<Booking>) => {
     if (titleEvent && selectedDate) {
@@ -86,6 +90,8 @@ export const CalendarBookings: React.FC = () => {
             datesSet={
               (dateInfo) => {
                 const { start, end } = dateInfo;
+                setStartTime(start);
+                setEndTime(end);
                 fetchBookings(start, end, auth?.accessToken ?? "");
               }
             }
@@ -105,6 +111,10 @@ export const CalendarBookings: React.FC = () => {
         onOpenChange={setIsDialogOpen}
         addBookingToClient={addBookingToClient}
         selectedDate={selectedDate}
+      />
+
+      <DialogEditBookingAdmin
+        booking={selectedBooking}
       />
     </div>
   );

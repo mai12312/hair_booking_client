@@ -72,13 +72,6 @@ export function SideBarAdminDashboard() {
                     <Images className="h-5 w-5" />
                 </TooltipSidebarAdmin>
                 
-                {/* Bookings */}
-                <TooltipSidebarAdmin
-                    tooltipContent="Bookings"
-                    href="/admin/dashboard/bookings"
-                >
-                    <SquareMenu className="h-5 w-5" />
-                </TooltipSidebarAdmin>
                 {/* Calendar */}
                 <TooltipSidebarAdmin
                     tooltipContent="Calendar"
