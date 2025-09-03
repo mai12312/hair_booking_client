@@ -80,7 +80,7 @@ export function ContentMainCategoriesAdmin() {
             });
             const data: DataResponse<{bookings: Booking[]}> = await resBooking.json();
             if(data && data.status == 200) {
-                const bookings = data.datas ?? [];
+                const bookings = data.datas.bookings ?? [];
                 if (bookings && Array.isArray(bookings) && bookings.length > 0) {
                     return true;
                 }
@@ -97,7 +97,7 @@ export function ContentMainCategoriesAdmin() {
         if (services && Array.isArray(services) && services.length > 0) {
             const hasBooking = await checkServicesHaveBookings(services);
             if (hasBooking) {
-                toast.error("Không thể xóa danh mục vì có lịch đặt!", { position: "bottom-right" });
+                toast.error("Không thể xóa danh mục vì có lịch đặt!");
                 setShowDeleteDialog(false);
                 setDeleteCategory(null);
                 return;
